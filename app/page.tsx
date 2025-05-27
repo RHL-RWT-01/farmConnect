@@ -1,4 +1,4 @@
-// "use client"
+"use client"
 
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/Header"
@@ -9,10 +9,6 @@ import CallToAction from "@/components/sections/CallToAction"
 import Benefits from "../utils/benefits"
 import Reviews from "../utils/reviews"
 
-export const metadata = {
-  title: 'AgriConnect',
-  description: 'Connecting Farmers and Consumers',
-}
 
 
 export default function Home() {
