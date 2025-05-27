@@ -1,21 +1,25 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
+import { dark } from '@clerk/themes'
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ]
+}
+
 
 export const metadata: Metadata = {
   title: 'AgriConnect',
   description: 'Connecting Farmers and Consumers',
   generator: 'Next.js',
-  applicationName: 'AgriConnect',
   referrer: 'origin-when-cross-origin',
   keywords: ['AgriConnect', 'Farmers', 'Consumers', 'Agriculture'],
   authors: [{ name: 'AgriConnect Team'}],
-  colorScheme: 'light dark',
   creator: 'AgriConnect Team',
-  publisher: 'AgriConnect Team',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
-  ]
+  publisher: 'AgriConnect Team'
 }
 
 export default function RootLayout({
@@ -24,8 +28,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <ClerkProvider appearance={{
+      baseTheme: dark
+    }}>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }
