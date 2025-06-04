@@ -11,7 +11,7 @@ export default function HowItWorks() {
             <div className="inline-block rounded-lg bg-green-100 dark:bg-green-900/30 px-3 py-1 text-sm text-green-800 dark:text-green-300">
               Simple Process
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">How FarmConnect Works</h2>
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">How AgriConnect Works</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl">
               Our platform makes it easy for farmers to connect with businesses and sell their crops directly.
             </p>
