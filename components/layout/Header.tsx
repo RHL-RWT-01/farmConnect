@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react"
 import { Sprout, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "../theme-toggle"
+import { scrollToSection } from "@/lib/navigation"
 
 export default function Header() {
   const { data: session } = useSession()
@@ -13,7 +14,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        
+
         {/* Left Logo */}
         <div className="flex items-center gap-2">
           <Sprout className="h-6 w-6 text-green-600" />
@@ -22,9 +23,29 @@ export default function Header() {
 
         {/* Center Navigation */}
         <nav className="hidden md:flex gap-6">
-          <Link href="#how-it-works" className="text-sm font-medium hover:text-primary">How It Works</Link>
-          <Link href="#features" className="text-sm font-medium hover:text-primary">Features</Link>
-          <Link href="#testimonials" className="text-sm font-medium hover:text-primary">Testimonials</Link>
+          <Link
+            href="#how-it-works"
+            onClick={(e) => scrollToSection(e, "#how-it-works")}
+            className="text-sm font-medium hover:text-primary"
+          >
+            How It Works
+          </Link>
+
+          <Link
+            href="#features"
+            onClick={(e) => scrollToSection(e, "#features")}
+            className="text-sm font-medium hover:text-primary"
+          >
+            Features
+          </Link>
+
+          <Link
+            href="#testimonials"
+            onClick={(e) => scrollToSection(e, "#testimonials")}
+            className="text-sm font-medium hover:text-primary"
+          >
+            Testimonials
+          </Link>
           <Link href="/products" className="text-sm font-medium hover:text-primary">Products</Link>
         </nav>
 
