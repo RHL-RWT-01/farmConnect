@@ -16,7 +16,12 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
 
         {/* Left Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer"
+        onClick={(e) => {
+          e.preventDefault()
+          scrollToSection(e, "#home")
+          }}
+        >
           <Sprout className="h-6 w-6 text-green-600" />
           <span className="text-xl font-bold">AgriConnect</span>
         </div>
