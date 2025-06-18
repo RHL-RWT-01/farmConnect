@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   authors: [{ name: "AgriConnect Team" }],
   creator: "AgriConnect Team",
   publisher: "AgriConnect Team",
+  icons:{
+    icon:"agri.png",
+    shortcut: "agri.png",
+    apple: "agri.png",
+  }
 }
 
 export default function RootLayout({
