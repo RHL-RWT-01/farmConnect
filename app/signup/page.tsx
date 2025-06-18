@@ -3,16 +3,16 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function SignupPage() {
+  const router = useRouter()
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     role: "FARMER",
   })
-
-  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -30,28 +30,40 @@ export default function SignupPage() {
     if (res.ok) {
       router.push("/login")
     } else {
-      alert("Signup failed")
+      alert("Signup failed. Try again.")
     }
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm p-6 bg-white rounded shadow-md space-y-4">
-        <h2 className="text-2xl font-bold text-center">Create Account</h2>
+    <section className="w-full py-20 md:py-32 lg:py-40">
+      <div className="container max-w-md px-4 space-y-6 bg-background p-6 rounded-xl shadow-lg border border-border">
+        <h2 className="text-3xl font-bold text-center text-foreground">Create your AgriConnect Account</h2>
 
-        <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Name" className="w-full p-2 border rounded" required />
-        <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Email" className="w-full p-2 border rounded" required />
-        <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" className="w-full p-2 border rounded" required />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input type="text" name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required />
+          <Input type="email" name="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
+          <Input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} required />
 
-        <select name="role" value={form.role} onChange={handleChange} className="w-full p-2 border rounded">
-          <option value="FARMER">Farmer</option>
-          <option value="BUYER">Buyer</option>
-        </select>
+          <select
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="w-full p-2 rounded-md border border-input bg-background text-foreground text-sm"
+          >
+            <option value="FARMER">Farmer</option>
+            <option value="BUYER">Buyer</option>
+          </select>
 
-        <Button type="submit" className="w-full">Sign Up</Button>
+          <Button type="submit" className="w-full">
+            Sign Up
+          </Button>
+        </form>
 
-        <p className="text-center text-sm">Already have an account? <a href="/login" className="text-blue-600">Log in</a></p>
-      </form>
-    </div>
+        <p className="text-sm text-center text-muted-foreground">
+          Already have an account?{" "}
+          <a href="/login" className="text-primary hover:underline">Log in</a>
+        </p>
+      </div>
+    </section>
   )
 }
