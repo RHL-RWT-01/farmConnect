@@ -29,3 +29,4 @@ next-env.d.ts
 /.clerk/
 
 .cursor
+/lib/generated/prisma

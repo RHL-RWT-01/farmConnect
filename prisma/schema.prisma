@@ -1,0 +1,53 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Make sure your .env file has this
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+
+  products  Product[] // One-to-many relation
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  unit        String // kg, bunch, piece, etc.
+  image       String
+  category    ProductCategory
+  organic     Boolean
+  inStock     Boolean
+  quantity    Int
+
+  // Relation to User (Farmer)
+  farmerId    String
+  farmer      User     @relation(fields: [farmerId], references: [id])
+}
+
+enum Role {
+  FARMER
+  BUYER
+}
+
+enum ProductCategory {
+  vegetables
+  fruits
+  spices
+  grains
+  pulses
+  dairy
+}
+
