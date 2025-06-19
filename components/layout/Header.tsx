@@ -1,25 +1,32 @@
 "use client"
 
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
-import { Sprout, ShoppingCart } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { LayoutDashboard, LogOut, ShoppingCart, Sprout } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "../theme-toggle"
 import { scrollToSection } from "@/lib/navigation"
+import { useAuth } from "@/hooks/useAuth"
+import Image from "next/image"
 
 export default function Header() {
-  const { data: session } = useSession()
-  const isSignedIn = !!session?.user
+  const router = useRouter()
+  const { isAuthenticated, user, loading, logout } = useAuth()
+
+  if (loading) {
+    return null // or a loader/skeleton if you want
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
 
-        {/* Left Logo */}
-        <div className="flex items-center gap-2 cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault()
-          scrollToSection(e, "#home")
+        {/* Logo */}
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault()
+            scrollToSection(e, "#home")
           }}
         >
           <Sprout className="h-6 w-6 text-green-600" />
@@ -35,7 +42,6 @@ export default function Header() {
           >
             How It Works
           </Link>
-
           <Link
             href="#features"
             onClick={(e) => scrollToSection(e, "#features")}
@@ -43,7 +49,6 @@ export default function Header() {
           >
             Features
           </Link>
-
           <Link
             href="#testimonials"
             onClick={(e) => scrollToSection(e, "#testimonials")}
@@ -51,21 +56,45 @@ export default function Header() {
           >
             Testimonials
           </Link>
-          <Link href="/products" className="text-sm font-medium hover:text-primary">Products</Link>
+          <Link href="/products" className="text-sm font-medium hover:text-primary">
+            Products
+          </Link>
         </nav>
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
           <ThemeToggle />
 
-          {isSignedIn ? (
+          {isAuthenticated && user ? (
             <>
-              <Button onClick={() => signOut()} variant="ghost" className="text-sm font-medium">
-                Logout
-              </Button>
-              <Link href="/cart">
-                <ShoppingCart className="h-6 w-6 text-green-600" />
+              {user.role === "BUYER" ? (
+                <Link href="/cart">
+                  <ShoppingCart className="h-6 w-6 text-green-600 hover:text-green-800 transition" />
+                </Link>
+              ) : (
+                <Link href="/farmer/dashboard">
+                  <LayoutDashboard className="h-6 w-6 text-green-600 hover:text-green-800 transition" />
+                </Link>
+              )}
+
+              <Link href="/profile">
+                <Image
+                  src={user.image || "/default-avatar.png"}
+                  alt="Profile"
+                  width={32}
+                  height={32}
+                  className="rounded-full cursor-pointer"
+                  priority
+                />
               </Link>
+
+              <Button
+                onClick={logout}
+                variant="ghost"
+                className="text-sm font-medium flex items-center gap-1"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </>
           ) : (
             <>
@@ -78,9 +107,6 @@ export default function Header() {
                 <Button className="dark:bg-green-400 dark:text-white">
                   Sign up
                 </Button>
-              </Link>
-              <Link href="/cart">
-                <ShoppingCart className="h-6 w-6 text-green-600" />
               </Link>
             </>
           )}
