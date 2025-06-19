@@ -42,23 +42,23 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="container py-8 px-4 md:px-6">
-      <Link href="/products" className="inline-flex items-center text-sm font-medium mb-6 hover:underline">
+      <Link href="/products" className="inline-flex items-center text-sm font-medium mb-6 hover:underline text-green-600 dark:text-green-400">
         <ChevronLeft className="mr-1 h-4 w-4" />
         Back to Products
       </Link>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="relative aspect-square">
+      <div className="grid md:grid-cols-2 gap-8 items-start">
+        <div className="relative aspect-square rounded-xl overflow-hidden shadow-xl dark:shadow-green-800/50 shadow-green-400/30 border border-muted">
           <Image
             src={product.image || "/placeholder.svg"}
             alt={product.name}
             fill
-            className="object-cover rounded-lg"
+            className="object-cover rounded-xl transition-all duration-300 hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
           {product.organic && (
-            <Badge className="absolute top-4 left-4 bg-green-600 hover:bg-green-700">
+            <Badge className="absolute top-4 left-4 bg-green-600 text-white dark:bg-green-500">
               <Leaf className="mr-1 h-3.5 w-3.5" />
               Organic
             </Badge>
@@ -67,18 +67,21 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            <div className="flex items-center mt-2">
-              <Link href={`/farmers/${product.farmer.id}`} className="text-sm text-muted-foreground hover:underline">
+            <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
+            <div className="flex items-center mt-2 text-sm text-muted-foreground">
+              <Link
+                href={`/farmers/${product.farmer.id}`}
+                className="hover:underline hover:text-green-600 dark:hover:text-green-400"
+              >
                 {product.farmer.name}
               </Link>
-              <span className="mx-2 text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">{product.farmer.location}</span>
+              <span className="mx-2">•</span>
+              <span>{product.farmer.location}</span>
             </div>
           </div>
 
-          <div className="text-2xl font-bold">
-          ₹{product.price.toFixed(2)} <span className="text-base font-normal">/ {product.unit}</span>
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            ₹{product.price.toFixed(2)} <span className="text-base font-normal text-muted-foreground">/ {product.unit}</span>
           </div>
 
           <p className="text-muted-foreground">{product.description}</p>
@@ -86,7 +89,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <Separator />
 
           <div className="space-y-4">
-            <div className="flex items-center">
+            <div className="flex items-center flex-wrap">
               <span className="font-medium mr-4">Quantity:</span>
               <div className="flex items-center border rounded-md">
                 <Button variant="ghost" size="icon" onClick={decrementQuantity} disabled={quantity <= 1}>
@@ -107,7 +110,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </span>
             </div>
 
-            <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={!product.inStock}>
+            <Button
+              size="lg"
+              className="w-full bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600"
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+            >
               <ShoppingCart className="mr-2 h-5 w-5" />
               {product.inStock ? "Add to Cart" : "Out of Stock"}
             </Button>
