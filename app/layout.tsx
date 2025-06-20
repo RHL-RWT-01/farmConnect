@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import AuthProvider from "@/components/providers/sessionProvider"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import { AuthProvider } from "@/components/providers/AuthProvider"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   authors: [{ name: "AgriConnect Team" }],
   creator: "AgriConnect Team",
   publisher: "AgriConnect Team",
-  icons:{
-    icon:"agri.png",
+  icons: {
+    icon: "agri.png",
     shortcut: "agri.png",
     apple: "agri.png",
   }

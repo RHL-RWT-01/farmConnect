@@ -1,40 +1,30 @@
-"use client"
+"use client";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Loader2 } from "lucide-react"
+import { Loader2, LogOut } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { user, logout, hasFetched, loading } = useAuth();
 
-  if (status === "loading") {
+  if (!hasFetched || loading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <Loader2 className="h-6 w-6 animate-spin text-green-600" />
       </div>
-    )
+    );
   }
 
-//   if (!session?.user) {
-//     router.push("/login")
-//     return null
-//   }
-
-//   const { name, email, role } = session.user as {
-//     name: string
-//     email: string
-//     role: "FARMER" | "BUYER"
-//   }
-
-  // Mock user data for demonstration
-  const {name, email, role} = {
-    name: "Rahul Rawat",
-    email: "a@b.com",
-    role: "FARMER"
+  if (!user) {
+    return (
+      <div className="text-center mt-10 text-muted-foreground text-lg">
+        Unauthorized. Please <Link href="/login" className="text-green-600 underline">log in</Link>.
+      </div>
+    );
   }
+
+  const { name, email, role } = user;
 
   return (
     <section className="w-full py-20 md:py-28">
@@ -43,7 +33,7 @@ export default function ProfilePage() {
           <h2 className="text-3xl font-bold text-foreground">Welcome, {name}!</h2>
           <p className="text-muted-foreground">{email}</p>
           <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-800 dark:text-white">
-            Role: {role}
+            Role: {role || "User"}
           </span>
         </div>
 
@@ -71,8 +61,18 @@ export default function ProfilePage() {
               <Button className="mt-2 bg-green-600 hover:bg-green-700">Browse Crops</Button>
             </Link>
           </div>
+
         )}
+
+        <Button
+          onClick={logout}
+          variant="ghost"
+          className="text-sm font-medium flex items-center gap-1"
+          title="Logout"
+        >
+          <LogOut className="h-5 w-5" />
+        </Button>
       </div>
     </section>
-  )
+  );
 }
