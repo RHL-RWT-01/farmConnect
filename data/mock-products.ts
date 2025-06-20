@@ -1,7 +1,5 @@
 import type { Product } from "@/types/product"
 
-// Note: Prices are indicative and in INR (Indian Rupees).
-// Units like 'kg', 'quintal' (100kg), 'bunch', 'dozen', 'piece' are used.
 
 export const mockProducts: Product[] = [
   {
