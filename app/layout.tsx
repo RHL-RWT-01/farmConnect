@@ -3,6 +3,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import { AuthProvider } from "@/components/providers/AuthProvider"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -20,8 +21,8 @@ export const metadata: Metadata = {
   authors: [{ name: "AgriConnect Team" }],
   creator: "AgriConnect Team",
   publisher: "AgriConnect Team",
-  icons:{
-    icon:"agri.png",
+  icons: {
+    icon: "agri.png",
     shortcut: "agri.png",
     apple: "agri.png",
   }
@@ -35,18 +36,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

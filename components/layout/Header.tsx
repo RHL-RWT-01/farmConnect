@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Sprout,
   LogOut,
+  Loader,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -14,12 +15,19 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "../theme-toggle";
 import { scrollToSection } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 export default function Header() {
-  const { user, isAuthenticated, loading, hasFetched, logout } = useAuth();
+  const { user, isAuthenticated, loading, hasFetched } = useAuth();
+  const router = useRouter();
 
-  // While loading or not fetched, don't show header icons
-  if (loading || !hasFetched) return null;
+// useEffect(() => {
+//   if (isAuthenticated) {
+//     router.refresh(); 
+//   }
+// }, [isAuthenticated, router]);
+
+  if (loading || !hasFetched) return <Loader className="h-30 w-20 animate-spin text-green-600" />;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -86,7 +94,7 @@ export default function Header() {
               </Link>
 
               {/* Logout */}
-              
+
             </>
           ) : (
             <>

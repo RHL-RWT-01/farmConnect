@@ -53,7 +53,6 @@
     "lucide-react": "^0.454.0",
     "mongoose": "^8.15.1",
     "next": "^15.2.3",
-    "next-auth": "^4.24.11",
     "next-themes": "latest",
     "react": "18.2.0",
     "react-day-picker": "8.10.1",
