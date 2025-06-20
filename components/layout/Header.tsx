@@ -1,110 +1,106 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { LayoutDashboard, LogOut, ShoppingCart, Sprout } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "../theme-toggle"
-import { scrollToSection } from "@/lib/navigation"
-import { useAuth } from "@/hooks/useAuth"
-import Image from "next/image"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Sprout,
+  LogOut,
+} from "lucide-react";
+import Image from "next/image";
+
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "../theme-toggle";
+import { scrollToSection } from "@/lib/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
-  const router = useRouter()
-  const { isAuthenticated, user, loading, logout } = useAuth()
+  const { user, isAuthenticated, loading, hasFetched, logout } = useAuth();
 
-  if (loading) {
-    return null // or a loader/skeleton if you want
-  }
+  // While loading or not fetched, don't show header icons
+  if (loading || !hasFetched) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-
-        {/* Logo */}
+        {/* ─── Logo ─────────────────────────────────────────────── */}
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={(e) => {
-            e.preventDefault()
-            scrollToSection(e, "#home")
+            e.preventDefault();
+            scrollToSection(e, "#home");
           }}
         >
           <Sprout className="h-6 w-6 text-green-600" />
           <span className="text-xl font-bold">AgriConnect</span>
         </div>
 
-        {/* Center Navigation */}
+        {/* ─── Center Navigation ──────────────────────────────── */}
         <nav className="hidden md:flex gap-6">
+          {["how-it-works", "features", "testimonials"].map((id) => (
+            <Link
+              key={id}
+              href={`#${id}`}
+              onClick={(e) => scrollToSection(e, `#${id}`)}
+              className="text-sm font-medium hover:text-primary"
+            >
+              {id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+            </Link>
+          ))}
           <Link
-            href="#how-it-works"
-            onClick={(e) => scrollToSection(e, "#how-it-works")}
+            href="/products"
             className="text-sm font-medium hover:text-primary"
           >
-            How It Works
-          </Link>
-          <Link
-            href="#features"
-            onClick={(e) => scrollToSection(e, "#features")}
-            className="text-sm font-medium hover:text-primary"
-          >
-            Features
-          </Link>
-          <Link
-            href="#testimonials"
-            onClick={(e) => scrollToSection(e, "#testimonials")}
-            className="text-sm font-medium hover:text-primary"
-          >
-            Testimonials
-          </Link>
-          <Link href="/products" className="text-sm font-medium hover:text-primary">
             Products
           </Link>
         </nav>
 
-        {/* Right Side */}
+        {/* ─── Right Side ─────────────────────────────────────── */}
         <div className="flex items-center gap-4">
           <ThemeToggle />
 
           {isAuthenticated && user ? (
             <>
+              {/* Role-based icon */}
               {user.role === "BUYER" ? (
-                <Link href="/cart">
+                <Link href="/cart" title="Cart">
                   <ShoppingCart className="h-6 w-6 text-green-600 hover:text-green-800 transition" />
                 </Link>
               ) : (
-                <Link href="/farmer/dashboard">
+                <Link href="/farmer/dashboard" title="Dashboard">
                   <LayoutDashboard className="h-6 w-6 text-green-600 hover:text-green-800 transition" />
                 </Link>
               )}
 
-              <Link href="/profile">
+              {/* Profile */}
+              <Link href="/profile" title="Profile">
                 <Image
                   src={user.image || "/default-avatar.png"}
                   alt="Profile"
                   width={32}
                   height={32}
-                  className="rounded-full cursor-pointer"
+                  className="rounded-full cursor-pointer hover:ring-2 ring-green-500"
                   priority
                 />
               </Link>
 
-              <Button
-                onClick={logout}
-                variant="ghost"
-                className="text-sm font-medium flex items-center gap-1"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+              {/* Logout */}
+              
             </>
           ) : (
             <>
+              {/* Guest actions */}
               <Link href="/login">
-                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4">
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                >
                   Log in
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button className="dark:bg-green-400 dark:text-white">
+                <Button className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-400 dark:text-white">
                   Sign up
                 </Button>
               </Link>
@@ -113,5 +109,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
