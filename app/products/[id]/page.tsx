@@ -7,48 +7,42 @@ import { notFound } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/hooks/use-toast"
 import { ChevronLeft, Leaf, Minus, Plus, ShoppingCart } from "lucide-react"
-import { mockProducts } from "@/data/mock-products"
+
+import { useProductContext } from "@/contexts/ProductContext"
+import { useCartContext } from "@/contexts/CartContext"
 
 export default function ProductPage({ params }: { params: { id: string } }) {
-  const { toast } = useToast()
+  const { products } = useProductContext()
+  const { addToCart } = useCartContext() 
   const [quantity, setQuantity] = useState(1)
 
-  const product = mockProducts.find((p) => p.id === params.id)
+  /* ─── Locate product from context ───────────────────────── */
+  const product = products.find((p) => p.id === params.id)
+  if (!product) notFound()
 
-  if (!product) {
-    notFound()
+  /* ─── Handlers ──────────────────────────────────────────── */
+  const increment = () => {
+    if (quantity < product.quantity) setQuantity(q => q + 1)
   }
-
-  const handleAddToCart = () => {
-    toast({
-      title: "Added to cart",
-      description: `${quantity} ${quantity > 1 ? "items" : "item"} of ${product.name} added to your cart.`,
-    })
+  const decrement = () => {
+    if (quantity > 1) setQuantity(q => q - 1)
   }
-
-  const incrementQuantity = () => {
-    if (quantity < product.quantity) {
-      setQuantity(quantity + 1)
-    }
-  }
-
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1)
-    }
-  }
+  const handleAdd = () => addToCart(product, quantity)
 
   return (
     <div className="container py-8 px-4 md:px-6">
-      <Link href="/products" className="inline-flex items-center text-sm font-medium mb-6 hover:underline text-green-600 dark:text-green-400">
+      <Link
+        href="/products"
+        className="inline-flex items-center text-sm font-medium mb-6 hover:underline text-green-600 dark:text-green-400"
+      >
         <ChevronLeft className="mr-1 h-4 w-4" />
         Back to Products
       </Link>
 
       <div className="grid md:grid-cols-2 gap-8 items-start">
-        <div className="relative aspect-square rounded-xl overflow-hidden shadow-xl dark:shadow-green-800/50 shadow-green-400/30 border border-muted">
+        {/* Image */}
+        <div className="relative aspect-square rounded-xl overflow-hidden shadow-xl border border-muted">
           <Image
             src={product.image || "/placeholder.svg"}
             alt={product.name}
@@ -59,15 +53,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           />
           {product.organic && (
             <Badge className="absolute top-4 left-4 bg-green-600 text-white dark:bg-green-500">
-              <Leaf className="mr-1 h-3.5 w-3.5" />
-              Organic
+              <Leaf className="mr-1 h-3.5 w-3.5" /> Organic
             </Badge>
           )}
         </div>
 
+        {/* Details */}
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
+          <header>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
             <div className="flex items-center mt-2 text-sm text-muted-foreground">
               <Link
                 href={`/farmers/${product.farmer.id}`}
@@ -78,28 +72,30 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               <span className="mx-2">•</span>
               <span>{product.farmer.location}</span>
             </div>
-          </div>
+          </header>
 
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-            ₹{product.price.toFixed(2)} <span className="text-base font-normal text-muted-foreground">/ {product.unit}</span>
-          </div>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            ₹{product.price.toFixed(2)}
+            <span className="text-base font-normal text-muted-foreground"> / {product.unit}</span>
+          </p>
 
           <p className="text-muted-foreground">{product.description}</p>
 
           <Separator />
 
+          {/* Quantity + Add */}
           <div className="space-y-4">
             <div className="flex items-center flex-wrap">
               <span className="font-medium mr-4">Quantity:</span>
               <div className="flex items-center border rounded-md">
-                <Button variant="ghost" size="icon" onClick={decrementQuantity} disabled={quantity <= 1}>
+                <Button variant="ghost" size="icon" onClick={decrement} disabled={quantity <= 1}>
                   <Minus className="h-4 w-4" />
                 </Button>
                 <span className="w-10 text-center">{quantity}</span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={incrementQuantity}
+                  onClick={increment}
                   disabled={quantity >= product.quantity || !product.inStock}
                 >
                   <Plus className="h-4 w-4" />
@@ -113,7 +109,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <Button
               size="lg"
               className="w-full bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600"
-              onClick={handleAddToCart}
+              onClick={handleAdd}
               disabled={!product.inStock}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
@@ -121,9 +117,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             </Button>
 
             <div className="text-sm text-muted-foreground">
-              <p>
-                Category: <span className="font-medium capitalize">{product.category}</span>
-              </p>
+              Category:{" "}
+              <span className="font-medium capitalize">{product.category}</span>
             </div>
           </div>
         </div>
