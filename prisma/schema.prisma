@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Make sure your .env file has this
+  url      = env("DATABASE_URL") 
 }
 
 model User {
@@ -14,7 +14,8 @@ model User {
   name      String
   role      Role
   createdAt DateTime @default(now())
-
+  image     String?
+  location  String?
   products Product[] // One-to-many relation
   CartItem CartItem[]
 }
