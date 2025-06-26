@@ -65,7 +65,7 @@ export default function FarmerDashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Farmer Dashboard</h1>
         <Button asChild className="gap-2">
-          <Link href="/farmer/add-product">
+          <Link href="/farmer/add-crop">
             <PlusCircle className="h-5 w-5" /> Add New Crop
           </Link>
         </Button>

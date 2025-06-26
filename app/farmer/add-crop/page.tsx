@@ -1,130 +1,222 @@
+// app/farmer/add-crop/page.tsx
 "use client"
 
-import { useState, ChangeEvent, FormEvent } from "react"
-import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Plus, Loader2, ImagePlus, ArrowLeft } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
-import { ProductCategory } from "@/types/product"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/useAuth"
 
-const categories: ProductCategory[] = [
-  "vegetables",
-  "fruits",
-  "spices",
-  "grains",
-  "pulses",
-  "dairy"
-]
+const categories = ["vegetables", "fruits", "spices", "grains", "pulses", "dairy"] as const
 
-export default function AddCropForm() {
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: 0,
-    unit: "kg",
-    category: "vegetables" as ProductCategory,
-    image: "",
-    organic: false,
-    inStock: true,
-    quantity: 0,
-  })
+type Category = (typeof categories)[number]
 
-  const [preview, setPreview] = useState<string | null>(null)
+export default function AddCropPage() {
+  const { toast } = useToast()
+  const { user } = useAuth()
+  const router = useRouter()
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    setForm({
-      ...form,
-      [name]:
-        type === "checkbox" && "checked" in e.target
-          ? (e.target as HTMLInputElement).checked
-          : value
-    })
-  }
+  /* ── state ─────────────────────────────────────── */
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [price, setPrice] = useState<string>("")
+  const [quantity, setQuantity] = useState<string>("")
+  const [unit, setUnit] = useState("kg")
+  const [category, setCategory] = useState<Category>("vegetables")
+  const [organic, setOrganic] = useState(false)
+  const [inStock, setInStock] = useState(true)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  /* ── image preview ─────────────────────────────── */
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setForm(prev => ({ ...prev, image: reader.result as string }))
-        setPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+      setImageFile(file)
+      setPreviewUrl(URL.createObjectURL(file))
     }
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  /* ── submit ────────────────────────────────────── */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Submitted Crop:", form)
-    // Add actual submission logic here
+
+    // basic validation
+    if (!name || !price || !quantity || !unit || !imageFile) {
+      toast({ title: "Missing fields", description: "Please fill all required fields", variant: "destructive" })
+      return
+    }
+
+    const priceNum = parseFloat(price)
+    const qtyNum = parseInt(quantity)
+    if (priceNum < 0 || qtyNum < 0) {
+      toast({ title: "Invalid numbers", description: "Price and quantity must be non‑negative", variant: "destructive" })
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      // FormData to include image file
+      const formData = new FormData()
+      formData.append("name", name)
+      formData.append("description", description)
+      formData.append("price", priceNum.toString())
+      formData.append("quantity", qtyNum.toString())
+      formData.append("unit", unit)
+      formData.append("category", category)
+      formData.append("organic", String(organic))
+      formData.append("inStock", String(inStock))
+      formData.append("image", imageFile!)
+
+      const res = await fetch("/api/farmer/products", { method: "POST", body: formData })
+      if (!res.ok) throw new Error("Failed to add product")
+
+      toast({ title: "Product added", description: `${name} saved successfully` })
+      router.push("/farmer/dashboard")
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Something went wrong", variant: "destructive" })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
-    <section className="w-full py-20 md:py-32 lg:py-40">
-      <div className="container max-w-2xl px-4 space-y-6 bg-background p-6 rounded-xl shadow-lg border border-border">
-        <h2 className="text-3xl font-bold text-center text-foreground">Add New Crop</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Name</Label>
-            <Input name="name" value={form.name} onChange={handleChange} required />
-          </div>
+    <div className="container py-8">
+      <Link href="/farmer/dashboard">
+        <Button variant="ghost" size="sm" className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to dashboard
+        </Button>
+      </Link>
 
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <Textarea name="description" value={form.description} onChange={handleChange} required />
-          </div>
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>Add New Crop</CardTitle>
+            <CardDescription>Fill the details to list your produce.</CardDescription>
+          </CardHeader>
 
-          <div className="flex gap-4">
-            <div className="flex-1 space-y-2">
-              <Label>Price (INR)</Label>
-              <Input type="number" name="price" value={form.price} onChange={handleChange} required />
-            </div>
-            <div className="flex-1 space-y-2">
-              <Label>Unit</Label>
-              <Input name="unit" value={form.unit} onChange={handleChange} required />
-            </div>
-          </div>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              {/* name */}
+              <div className="space-y-2">
+                <Label>Name*</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
 
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <select name="category" value={form.category} onChange={handleChange} className="w-full p-2 rounded-md border">
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-              ))}
-            </select>
-          </div>
+              {/* category */}
+              <div className="space-y-2">
+                <Label>Category*</Label>
+                <Select value={category} onValueChange={(v: Category) => setCategory(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-32 overflow-y-auto">
+                    {categories.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label>Quantity</Label>
-            <Input type="number" name="quantity" value={form.quantity} onChange={handleChange} required />
-          </div>
+              {/* price & qty */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Price (₹)*</Label>
+                  <Input type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Quantity*</Label>
+                  <Input type="number" min="0" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
+                </div>
+              </div>
 
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" name="organic" checked={form.organic} onChange={handleChange} />
-              <span>Organic</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" name="inStock" checked={form.inStock} onChange={handleChange} />
-              <span>In Stock</span>
-            </label>
-          </div>
+              {/* unit */}
+              <div className="space-y-2">
+                <Label>Unit*</Label>
+                <Input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="kg, piece, bunch …" required />
+              </div>
 
-          <div className="space-y-2">
-            <Label>Upload Image</Label>
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
-            {preview && (
-              <img src={preview} alt="Preview" className="mt-2 w-full max-h-64 object-cover rounded-md shadow-md" />
-            )}
-          </div>
+              {/* description */}
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+              </div>
 
-          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white">
-            Add Crop
-          </Button>
-        </form>
+              {/* image upload with preview */}
+              <div className="space-y-2">
+                <Label>Product Image*</Label>
+                <div className="flex items-center gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-32 border-dashed flex flex-col items-center justify-center"
+                    onClick={() => document.getElementById("image-input")?.click()}
+                  >
+                    <ImagePlus className="h-8 w-8 mb-2 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Click to upload</span>
+                  </Button>
+                  <input id="image-input" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+
+                  {previewUrl && (
+                    <div className="relative h-32 w-32 rounded-md overflow-hidden">
+                      <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0"
+                        onClick={() => { setImageFile(null); setPreviewUrl(null) }}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* checkboxes */}
+              <div className="flex items-center space-x-2">
+                <Checkbox id="organic" checked={organic} onCheckedChange={checked => setOrganic(checked === true)} />
+                <Label htmlFor="organic">Organic</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="instock" checked={inStock} onCheckedChange={checked => setInStock(checked === true)} />
+                <Label htmlFor="instock">In Stock</Label>
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex justify-between">
+              <Button type="button" variant="ghost" onClick={() => router.back()} disabled={submitting}>Cancel</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving</>) : "Save"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
       </div>
-    </section>
+    </div>
   )
 }
