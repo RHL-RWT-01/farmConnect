@@ -1,5 +1,4 @@
-import { supabase } from "./supabaseClient"
-
+import { supabase } from "@/lib/supabaseClient";
 export async function uploadProductImage(imageFile: File): Promise<string> {
   const fileExt = imageFile.name.split(".").pop()
   const fileName = `${Date.now()}.${fileExt}`
