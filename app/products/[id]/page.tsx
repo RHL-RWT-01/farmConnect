@@ -14,14 +14,14 @@ import { useCartContext } from "@/contexts/CartContext"
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const { products } = useProductContext()
-  const { addToCart } = useCartContext() 
+  const { addToCart } = useCartContext()
   const [quantity, setQuantity] = useState(1)
 
-  /* ─── Locate product from context ───────────────────────── */
+  /* ─── get product from context ───────────────────────── */
   const product = products.find((p) => p.id === params.id)
   if (!product) notFound()
 
-  /* ─── Handlers ──────────────────────────────────────────── */
+  /* ─── Handlers ──── */
   const increment = () => {
     if (quantity < product.quantity) setQuantity(q => q + 1)
   }
