@@ -90,7 +90,7 @@ export default function AddCropPage() {
           organic,
           inStock,
           image: imageUrl,
-          farmerId: user?.id, 
+          farmerId: user?.id,
         }),
       })
 
