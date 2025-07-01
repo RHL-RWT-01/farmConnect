@@ -4,6 +4,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import { AuthProvider } from "@/components/providers/AuthProvider"
+import { ProductProvider } from "@/contexts/ProductContext"
+import { CartProvider } from "@/contexts/CartContext"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -43,11 +45,15 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <ProductProvider>
+              <CartProvider>
+                <div className="flex min-h-screen flex-col">
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+              </CartProvider>
+            </ProductProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

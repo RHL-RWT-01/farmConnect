@@ -3,49 +3,34 @@
 import { useState } from "react"
 import { ProductGrid } from "@/components/product-grid"
 import { ProductFilters } from "@/components/product-filters"
-import type { Product, ProductFilterOptions } from "@/types/product"
-import { useToast } from "@/hooks/use-toast"
-import { mockProducts } from "@/data/mock-products"
+import type { ProductFilterOptions } from "@/types/product"
+import { useProductContext } from "@/contexts/ProductContext"
+import { useCartContext } from "@/contexts/CartContext"
 
 export default function ProductsPage() {
-  const { toast } = useToast()
-  const [cart, setCart] = useState<Product[]>([])
+  const { products, loading } = useProductContext()
+  const { addToCart } = useCartContext()
   const [filterOptions, setFilterOptions] = useState<ProductFilterOptions>({})
 
-  // In a real app, you would fetch this data from an API
-  const products = mockProducts
-
-  const maxPrice = Math.max(...products.map((p) => p.price))
-
-  const handleAddToCart = (product: Product) => {
-    setCart([...cart, product])
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    })
-  }
+  const maxPrice = products.length ? Math.max(...products.map((p) => p.price)) : 0
 
   const handleFilterChange = (newFilters: ProductFilterOptions) => {
     setFilterOptions(newFilters)
   }
 
   const filteredProducts = products.filter((product) => {
-    // Filter by category
     if (filterOptions.category && product.category !== filterOptions.category) {
       return false
     }
 
-    // Filter by organic
     if (filterOptions.organic && !product.organic) {
       return false
     }
 
-    // Filter by stock
     if (filterOptions.inStock && !product.inStock) {
       return false
     }
 
-    // Filter by price range
     if (filterOptions.priceRange) {
       const { min, max } = filterOptions.priceRange
       if (product.price < min || product.price > max) {
@@ -56,7 +41,6 @@ export default function ProductsPage() {
     return true
   })
 
-  // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (!filterOptions.sortBy) return 0
 
@@ -84,7 +68,11 @@ export default function ProductsPage() {
       </div>
 
       <div className="mb-6">
-        <ProductFilters filterOptions={filterOptions} onFilterChange={handleFilterChange} maxPrice={maxPrice} />
+        <ProductFilters
+          filterOptions={filterOptions}
+          onFilterChange={handleFilterChange}
+          maxPrice={maxPrice}
+        />
       </div>
 
       <div className="mb-4">
@@ -93,12 +81,16 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {sortedProducts.length > 0 ? (
-        <ProductGrid products={sortedProducts} onAddToCart={handleAddToCart} />
+      {loading ? (
+        <div className="text-center py-12">Loading products...</div>
+      ) : sortedProducts.length > 0 ? (
+        <ProductGrid products={sortedProducts} onAddToCart={addToCart} />
       ) : (
         <div className="text-center py-12">
           <h3 className="text-lg font-medium mb-2">No products found</h3>
-          <p className="text-muted-foreground">Try adjusting your filters to find what you're looking for.</p>
+          <p className="text-muted-foreground">
+            Try adjusting your filters to find what you're looking for.
+          </p>
         </div>
       )}
     </div>

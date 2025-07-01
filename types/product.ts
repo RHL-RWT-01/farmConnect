@@ -1,20 +1,20 @@
 export interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  unit: string // e.g., "lb", "each", "bunch"
-  image: string
-  category: ProductCategory
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  unit: string;
+  image: string;
+  category: ProductCategory;
+  organic: boolean;
+  inStock: boolean;
+  quantity: number;
   farmer: {
-    id: string
-    name: string
-    location: string
-    image: string
-  }
-  organic: boolean
-  inStock: boolean
-  quantity: number
+    id: string;
+    name: string;
+    location: string;
+    image: string;
+  };
 }
 
 export type ProductCategory =
@@ -23,15 +23,24 @@ export type ProductCategory =
   | "spices"
   | "grains"
   | "pulses"
-  | "dairy"
+  | "dairy";
 
 export interface ProductFilterOptions {
-  category?: ProductCategory
-  organic?: boolean
-  inStock?: boolean
+  category?: ProductCategory;
+  organic?: boolean;
+  inStock?: boolean;
   priceRange?: {
-    min: number
-    max: number
-  }
-  sortBy?: "price-asc" | "price-desc" | "name-asc" | "name-desc"
+    min: number;
+    max: number;
+  };
+  sortBy?: "price-asc" | "price-desc" | "name-asc" | "name-desc";
 }
+
+export interface CartItem {
+  id: string
+  product: Product
+  quantity: number
+  userId?: string  
+}
+
+
