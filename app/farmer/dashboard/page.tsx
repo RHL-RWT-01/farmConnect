@@ -155,7 +155,17 @@ function ProductTable({ products }: { products: any[] }) {
         <tbody>
           {products.map((p) => (
             <tr key={p.id} className="border-b last:border-none hover:bg-muted/10">
-              <td className="p-3 capitalize">{p.name}</td>
+              <td className="p-3">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-12 h-12 object-cover rounded-md border"
+                    onError={(e) => (e.currentTarget.src = "/placeholder.png")} // optional
+                  />
+                  <span className="capitalize font-medium">{p.name}</span>
+                </div>
+              </td>
               <td className="p-3 capitalize">{p.category}</td>
               <td className="p-3">₹{p.price}</td>
               <td className="p-3">{p.quantity}</td>
@@ -167,7 +177,9 @@ function ProductTable({ products }: { products: any[] }) {
                 )}
               </td>
               <td className="p-3 text-right space-x-2">
-                <Link href={`/farmer/edit-product/${p.id}`} className="text-green-600 hover:underline">Edit</Link>
+                <Link href={`/farmer/edit-product/${p.id}`} className="text-green-600 hover:underline">
+                  Edit
+                </Link>
               </td>
             </tr>
           ))}
@@ -183,3 +195,4 @@ function ProductTable({ products }: { products: any[] }) {
     </div>
   )
 }
+
