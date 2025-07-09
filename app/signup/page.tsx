@@ -13,6 +13,7 @@ export default function SignupPage() {
     password: "",
     role: "FARMER",
   })
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })

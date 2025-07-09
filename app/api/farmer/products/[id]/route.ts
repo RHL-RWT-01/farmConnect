@@ -49,6 +49,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 
+
 export async function DELETE(_: NextRequest, { params }: Params) {
   try {
     await prisma.product.delete({
