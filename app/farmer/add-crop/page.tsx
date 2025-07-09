@@ -76,7 +76,7 @@ export default function AddCropPage() {
     setSubmitting(true)
     try {
       const imageUrl = await uploadProductImage(imageFile)
-
+      console.log("Image uploaded to:", imageUrl)
       const res = await fetch("/api/farmer/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

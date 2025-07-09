@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse, NextRequest } from "next/server"
 
 
+
 // GET /api/farmer/products?farmerId=<id>
 export async function GET(req: NextRequest) {
   const farmerId = req.nextUrl.searchParams.get("farmerId")

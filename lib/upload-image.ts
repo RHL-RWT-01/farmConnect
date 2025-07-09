@@ -1,20 +1,28 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient"
+
 export async function uploadProductImage(imageFile: File): Promise<string> {
-  const fileExt = imageFile.name.split(".").pop()
-  const fileName = `${Date.now()}.${fileExt}`
+  const ext = imageFile.name.split(".").pop() || "png"
+  const fileName = `${crypto.randomUUID()}.${ext}`
   const filePath = `products/${fileName}`
 
   const { error } = await supabase.storage
     .from("product-images")
-    .upload(filePath, imageFile)
+    .upload(filePath, imageFile, {
+      contentType: imageFile.type,
+      upsert: false,
+    })
 
-  if (error) throw new Error("Image upload failed: " + error.message)
+  if (error) {
+    console.error("Supabase Upload Error:", error)
+    throw new Error("Image upload failed: " + error.message)
+  }
 
-  const { data: { publicUrl } } = supabase.storage
+  const { data } = supabase
+    .storage
     .from("product-images")
     .getPublicUrl(filePath)
 
-  if (!publicUrl) throw new Error("Failed to get public image URL")
+  if (!data?.publicUrl) throw new Error("Failed to get public image URL")
 
-  return publicUrl
+  return data.publicUrl
 }
