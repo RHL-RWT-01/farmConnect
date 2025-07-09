@@ -14,7 +14,7 @@ export default function EmptyCart() {
             <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
             <p className="text-muted-foreground mb-8">Looks like you haven't added any fresh produce to your cart yet.</p>
             <Button asChild size="lg" className="gap-2">
-                <Link href="/">
+                <Link href="/products">
                     <ShoppingBag className="h-4 w-4" />
                     Browse Marketplace
                 </Link>

@@ -1,16 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { ProductGrid } from "@/components/product-grid"
 import { ProductFilters } from "@/components/product-filters"
-import type { ProductFilterOptions } from "@/types/product"
-import { useProductContext } from "@/contexts/ProductContext"
+import type { ProductFilterOptions, Product } from "@/types/product"
 import { useCartContext } from "@/contexts/CartContext"
 
 export default function ProductsPage() {
-  const { products, loading } = useProductContext()
   const { addToCart } = useCartContext()
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
   const [filterOptions, setFilterOptions] = useState<ProductFilterOptions>({})
+  const [page, setPage] = useState<number>(1)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const limit = 12
+
+  const fetchProducts = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/products?page=${page}&limit=${limit}`)
+      const data = await res.json()
+
+      setProducts((prev) => [...prev, ...data.products])
+      setHasMore(data.products.length === limit)
+    } catch (error) {
+      console.error("Failed to fetch products:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [page])
+
+  const observer = useRef<IntersectionObserver | null>(null)
+  const lastProductRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return
+      if (observer.current) observer.current.disconnect()
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1)
+        }
+      })
+
+      if (node) observer.current.observe(node)
+    },
+    [loading, hasMore]
+  )
 
   const maxPrice = products.length ? Math.max(...products.map((p) => p.price)) : 0
 
@@ -81,10 +120,18 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {loading ? (
+      {sortedProducts.length > 0 ? (
+        <>
+          <ProductGrid products={sortedProducts} onAddToCart={addToCart} />
+
+          <div ref={lastProductRef} className="h-10" />
+
+          {loading && (
+            <div className="text-center py-4 text-muted-foreground">Loading more...</div>
+          )}
+        </>
+      ) : loading ? (
         <div className="text-center py-12">Loading products...</div>
-      ) : sortedProducts.length > 0 ? (
-        <ProductGrid products={sortedProducts} onAddToCart={addToCart} />
       ) : (
         <div className="text-center py-12">
           <h3 className="text-lg font-medium mb-2">No products found</h3>
