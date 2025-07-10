@@ -21,6 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/useAuth"
 import { uploadProductImage } from "@/lib/upload-image"
+import DeleteDialog from "@/components/ui/deletedialog"
 
 const categories = ["vegetables", "fruits", "spices", "grains", "pulses", "dairy"] as const
 type Category = (typeof categories)[number]
@@ -115,19 +116,17 @@ export default function EditCropPage() {
   }
 
   const handleDelete = async () => {
-    const confirmDelete = confirm("Are you sure you want to delete this crop?")
-    if (!confirmDelete) return
-
     try {
       const res = await fetch(`/api/farmer/products/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Delete failed")
 
-      toast({ title: "Product deleted", description: `${name} has been removed.` })
+      toast({ title: "🗑️ Product deleted", description: `"${name}" has been removed.` })
       router.push("/farmer/dashboard")
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" })
     }
   }
+
 
   if (loading) {
     return (
@@ -257,10 +256,12 @@ export default function EditCropPage() {
             <CardFooter className="flex justify-between flex-wrap gap-2 pt-4">
               <Button type="button" variant="ghost" onClick={() => router.back()} disabled={submitting}>Cancel</Button>
               <div className="flex gap-2 ml-auto">
-                <Button type="button" variant="destructive" onClick={handleDelete} disabled={submitting}>Delete</Button>
+                <DeleteDialog onDelete={handleDelete} />
                 <Button type="submit" className="bg-green-600 text-white hover:bg-green-700" disabled={submitting}>
                   {submitting ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving</>) : "Save"}
                 </Button>
+
+
               </div>
             </CardFooter>
           </form>
