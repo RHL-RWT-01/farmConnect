@@ -1,12 +1,24 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
 import { ArrowRight, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
 
 export default function HeroSection() {
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      router.push("/login")
+    } else if (user?.role === "BUYER") {
+      router.push("/products")
+    } else {
+      router.push("/farmer/dashboard")
+    }
+  }
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-background transition-colors">
       <div className="container px-4 md:px-6">
@@ -24,14 +36,13 @@ export default function HeroSection() {
 
             {/* CTA BUTTONS */}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-white transition-transform transform hover:scale-105"
-                >
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+                onClick={handleClick}
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white transition-transform transform hover:scale-105"
+              >
+                Get Started <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
               <Button
                 size="lg"
                 variant="outline"
