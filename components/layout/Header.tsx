@@ -21,13 +21,16 @@ export default function Header() {
   const { user, isAuthenticated, loading, hasFetched } = useAuth();
   const router = useRouter();
 
-// useEffect(() => {
-//   if (isAuthenticated) {
-//     router.refresh(); 
-//   }
-// }, [isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     router.refresh(); 
+  //   }
+  // }, [isAuthenticated, router]);
 
-  if (loading || !hasFetched) return <Loader className="h-30 w-20 animate-spin text-green-600" />;
+  if (loading || !hasFetched) return <div className="flex items-center justify-center h-screen w-full">
+    <Loader className="h-20 w-20 animate-spin text-green-600" />
+  </div>
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
