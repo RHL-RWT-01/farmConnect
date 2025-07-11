@@ -14,18 +14,19 @@ body {
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 120 20% 10%; /* deep greenish black for text */
+    --foreground: 0 0% 3.9%; /* stays neutral, dark gray/black */
 
     --card: 0 0% 100%;
-    --card-foreground: 120 20% 10%;
+    --card-foreground: 0 0% 3.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 120 20% 10%;
+    --popover-foreground: 0 0% 3.9%;
 
-    --primary: 120 60% 35%; /* primary green */
+    /* GREEN THEME COLORS */
+    --primary: 120 60% 35%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 120 30% 90%; /* light green tint */
+    --secondary: 120 30% 90%;
     --secondary-foreground: 120 60% 25%;
 
     --muted: 120 20% 95%;
@@ -63,15 +64,16 @@ body {
   }
 
   .dark {
-    --background: 120 10% 10%;
-    --foreground: 120 20% 90%;
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%; /* neutral white text in dark mode */
 
-    --card: 120 10% 12%;
-    --card-foreground: 120 20% 90%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 120 10% 12%;
-    --popover-foreground: 120 20% 90%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
+    /* GREEN THEME COLORS */
     --primary: 120 50% 50%; 
     --primary-foreground: 0 0% 100%;
 
