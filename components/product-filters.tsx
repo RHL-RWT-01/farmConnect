@@ -7,8 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -24,9 +22,12 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: ProductFiltersProps) {
+  
+  const filters = filterOptions ?? {}
+
   const [priceRange, setPriceRange] = useState<[number, number]>([
-    filterOptions.priceRange?.min || 0,
-    filterOptions.priceRange?.max || maxPrice,
+    filters.priceRange?.min ?? 0,
+    filters.priceRange?.max ?? maxPrice,
   ])
 
   const categories: { value: ProductCategory; label: string }[] = [
@@ -48,28 +49,34 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
     const newRange: [number, number] = [value[0], value[1]]
     setPriceRange(newRange)
     onFilterChange({
-      ...filterOptions,
+      ...filters,
       priceRange: { min: newRange[0], max: newRange[1] },
     })
   }
 
   const handleCategoryChange = (category: ProductCategory) => {
+    const current = filters.categories ?? []
+    const exists = current.includes(category)
+    const newCategories = exists
+      ? current.filter((c) => c !== category)
+      : [...current, category]
+
     onFilterChange({
-      ...filterOptions,
-      category: filterOptions.category === category ? undefined : category,
+      ...filters,
+      categories: newCategories.length > 0 ? newCategories : undefined,
     })
   }
 
   const handleCheckboxChange = (key: "organic" | "inStock") => {
     onFilterChange({
-      ...filterOptions,
-      [key]: !filterOptions[key],
+      ...filters,
+      [key]: !filters[key],
     })
   }
 
   const handleSortChange = (value: string) => {
     onFilterChange({
-      ...filterOptions,
+      ...filters,
       sortBy: value as ProductFilterOptions["sortBy"],
     })
   }
@@ -81,10 +88,10 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
 
   const hasActiveFilters = () => {
     return (
-      filterOptions.category !== undefined ||
-      filterOptions.organic !== undefined ||
-      filterOptions.inStock !== undefined ||
-      filterOptions.priceRange !== undefined
+      (filters.categories && filters.categories.length > 0) ||
+      filters.organic ||
+      filters.inStock ||
+      filters.priceRange
     )
   }
 
@@ -111,21 +118,25 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
                 <div key={category.value} className="flex items-center px-2 py-2">
                   <Checkbox
                     id={`category-${category.value}`}
-                    checked={filterOptions.category === category.value}
+                    checked={filters.categories?.includes(category.value) ?? false}
                     onCheckedChange={() => handleCategoryChange(category.value)}
                   />
-                  <label htmlFor={`category-${category.value}`} className="ml-2 text-sm font-medium cursor-pointer">
+                  <label
+                    htmlFor={`category-${category.value}`}
+                    className="ml-2 text-sm font-medium cursor-pointer"
+                  >
                     {category.label}
                   </label>
                 </div>
               ))}
             </div>
+
             <DropdownMenuSeparator />
             <div className="px-2 py-2">
               <div className="flex items-center mb-2">
                 <Checkbox
                   id="organic-filter"
-                  checked={filterOptions.organic}
+                  checked={filters.organic ?? false}
                   onCheckedChange={() => handleCheckboxChange("organic")}
                 />
                 <label htmlFor="organic-filter" className="ml-2 text-sm font-medium cursor-pointer">
@@ -135,7 +146,7 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
               <div className="flex items-center">
                 <Checkbox
                   id="instock-filter"
-                  checked={filterOptions.inStock}
+                  checked={filters.inStock ?? false}
                   onCheckedChange={() => handleCheckboxChange("inStock")}
                 />
                 <label htmlFor="instock-filter" className="ml-2 text-sm font-medium cursor-pointer">
@@ -143,6 +154,7 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
                 </label>
               </div>
             </div>
+
             <DropdownMenuSeparator />
             <div className="px-2 py-2">
               <p className="text-sm font-medium mb-2">Price Range</p>
@@ -161,6 +173,7 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
                 </div>
               </div>
             </div>
+
             <DropdownMenuSeparator />
             <div className="p-2">
               <Button variant="outline" size="sm" className="w-full" onClick={clearFilters}>
@@ -179,31 +192,39 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuRadioGroup value={filterOptions.sortBy} onValueChange={handleSortChange}>
-              {sortOptions.map((option) => (
-                <DropdownMenuRadioItem key={option.value} value={option.value}>
-                  {option.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
+            {sortOptions.map((option) => (
+              <Button
+                key={option.value}
+                variant={filters.sortBy === option.value ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => handleSortChange(option.value)}
+                className="w-full justify-start"
+              >
+                {option.label}
+              </Button>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {filterOptions.category && (
-          <Badge variant="secondary" className="flex gap-1 items-center">
-            {categories.find((c) => c.value === filterOptions.category)?.label}
-            <X className="h-3 w-3 cursor-pointer" onClick={() => handleCategoryChange(filterOptions.category!)} />
+        {filters.categories?.map((cat) => (
+          <Badge
+            key={cat}
+            variant="secondary"
+            className="flex gap-1 items-center"
+          >
+            {categories.find((c) => c.value === cat)?.label}
+            <X className="h-3 w-3 cursor-pointer" onClick={() => handleCategoryChange(cat)} />
           </Badge>
-        )}
+        ))}
 
-        {filterOptions.organic && (
+        {filters.organic && (
           <Badge variant="secondary" className="flex gap-1 items-center">
             Organic
             <X className="h-3 w-3 cursor-pointer" onClick={() => handleCheckboxChange("organic")} />
           </Badge>
         )}
 
-        {filterOptions.inStock && (
+        {filters.inStock && (
           <Badge variant="secondary" className="flex gap-1 items-center">
             In Stock
             <X className="h-3 w-3 cursor-pointer" onClick={() => handleCheckboxChange("inStock")} />
