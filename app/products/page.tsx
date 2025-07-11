@@ -58,7 +58,12 @@ export default function ProductsPage() {
   }
 
   const filteredProducts = products.filter((product) => {
-    if (filterOptions.category && product.category !== filterOptions.category) {
+    // Match any selected category
+    if (
+      filterOptions.categories &&
+      filterOptions.categories.length > 0 &&
+      !filterOptions.categories.includes(product.category)
+    ) {
       return false
     }
 
@@ -80,9 +85,9 @@ export default function ProductsPage() {
     return true
   })
 
+
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (!filterOptions.sortBy) return 0
-
     switch (filterOptions.sortBy) {
       case "price-asc":
         return a.price - b.price
