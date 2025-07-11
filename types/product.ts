@@ -26,7 +26,7 @@ export type ProductCategory =
   | "dairy";
 
 export interface ProductFilterOptions {
-  category?: ProductCategory;
+  categories?: ProductCategory[];
   organic?: boolean;
   inStock?: boolean;
   priceRange?: {
