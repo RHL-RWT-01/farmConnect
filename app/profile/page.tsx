@@ -1,12 +1,52 @@
 "use client";
 
-import { Loader2, LogOut } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { Loader2, LogOut, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-
+import { uploadProfileImage } from "@/lib/upload-image";
+import defaultAvatar from "@/public/default-avatar.png"; 
 export default function ProfilePage() {
-  const { user, logout, hasFetched, loading } = useAuth();
+  const { toast } = useToast();
+  const { user, logout, hasFetched, loading, refreshUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.image) setPreview(user.image);
+  }, [user]);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const url = await uploadProfileImage(file);
+
+      // Call your backend to update user profile image
+      const res = await fetch("/api/auth/me", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: url })
+      });
+
+      if (!res.ok) throw new Error("Failed to update profile image");
+
+      toast({ title: "Profile Updated", description: "Your profile picture was updated." });
+      setPreview(url);
+      refreshUser?.();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   if (!hasFetched || loading) {
     return (
@@ -29,6 +69,29 @@ export default function ProfilePage() {
   return (
     <section className="w-full py-20 md:py-28">
       <div className="container max-w-2xl bg-background p-8 border border-border rounded-xl shadow-md space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-green-600">
+            <Image
+              src={preview || defaultAvatar}
+              alt="Profile"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Upload className="h-4 w-4" />
+            {uploading ? "Uploading..." : "Change Picture"}
+          </Button>
+          <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageChange} />
+        </div>
+
         <div className="space-y-1 text-center">
           <h2 className="text-3xl font-bold text-foreground">Welcome, {name}!</h2>
           <p className="text-muted-foreground">{email}</p>
@@ -61,7 +124,6 @@ export default function ProfilePage() {
               <Button className="mt-2 bg-green-600 hover:bg-green-700">Browse Crops</Button>
             </Link>
           </div>
-
         )}
 
         <Button
@@ -70,7 +132,7 @@ export default function ProfilePage() {
           className="text-sm font-medium flex items-center gap-1"
           title="Logout"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="h-5 w-5" /> Logout
         </Button>
       </div>
     </section>
