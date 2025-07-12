@@ -35,7 +35,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        {/* ─── Logo ─────────────────────────────────────────────── */}
+        {/* Logo */}
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={(e) => {
@@ -47,7 +47,6 @@ export default function Header() {
           <span className="text-xl font-bold">AgriConnect</span>
         </div>
 
-        {/* ─── Center Navigation ──────────────────────────────── */}
         <nav className="hidden md:flex gap-6">
           {["how-it-works", "features", "testimonials"].map((id) => (
             <Link
@@ -67,7 +66,6 @@ export default function Header() {
           </Link>
         </nav>
 
-        {/* ─── Right Side ─────────────────────────────────────── */}
         <div className="flex items-center gap-4">
           <ThemeToggle />
 
@@ -86,15 +84,18 @@ export default function Header() {
 
               {/* Profile */}
               <Link href="/profile" title="Profile">
-                <Image
-                  src={user.image || "/default-avatar.png"}
-                  alt="Profile"
-                  width={32}
-                  height={32}
-                  className="rounded-full cursor-pointer hover:ring-2 ring-green-500"
-                  priority
-                />
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-600 hover:ring-2 ring-green-500 transition-all">
+                  <Image
+                    src={user.image || "/default-avatar.png"}
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                    priority
+                  />
+                </div>
               </Link>
+
 
               {/* Logout */}
 
