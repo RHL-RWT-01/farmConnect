@@ -8,4 +8,5 @@ export interface User {
   role: UserRole
   image?: string
   location?: string 
+  createdAt: string
 }

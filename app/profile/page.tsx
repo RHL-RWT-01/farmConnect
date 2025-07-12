@@ -9,16 +9,46 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { uploadProfileImage } from "@/lib/upload-image";
-import defaultAvatar from "@/public/default-avatar.png"; 
+import defaultAvatar from "@/public/default-avatar.png";
+
+// ✅ Modal Component
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-lg w-[90%] max-w-md text-center">
+        <h2 className="text-xl font-bold text-green-600">Profile Updated!</h2>
+        <p className="text-sm text-muted-foreground mt-2">
+          Your profile details have been successfully saved.
+        </p>
+        <button
+          className="mt-4 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md"
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { toast } = useToast();
   const { user, logout, hasFetched, loading, refreshUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [updating, setUpdating] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
-    if (user?.image) setPreview(user.image);
+    if (user) {
+      setPreview(user.image || null);
+      setName(user.name || "");
+      setLocation(user.location || "");
+    }
   }, [user]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,22 +59,56 @@ export default function ProfilePage() {
     try {
       const url = await uploadProfileImage(file);
 
-      // Call your backend to update user profile image
       const res = await fetch("/api/auth/me", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: url })
+        body: JSON.stringify({ image: url }),
       });
 
       if (!res.ok) throw new Error("Failed to update profile image");
 
-      toast({ title: "Profile Updated", description: "Your profile picture was updated." });
+      toast({
+        title: "Profile Updated",
+        description: "Your profile picture was updated.",
+      });
       setPreview(url);
       refreshUser?.();
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    setUpdating(true);
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, location }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update profile");
+
+      toast({
+        title: "Profile Updated",
+        description: "Your details were updated.",
+      });
+      setShowSuccessModal(true);
+      refreshUser?.();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -59,12 +123,14 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="text-center mt-10 text-muted-foreground text-lg">
-        Unauthorized. Please <Link href="/login" className="text-green-600 underline">log in</Link>.
+        Unauthorized. Please{" "}
+        <Link href="/login" className="text-green-600 underline">
+          log in
+        </Link>
+        .
       </div>
     );
   }
-
-  const { name, email, role } = user;
 
   return (
     <section className="w-full py-20 md:py-28">
@@ -89,52 +155,66 @@ export default function ProfilePage() {
             <Upload className="h-4 w-4" />
             {uploading ? "Uploading..." : "Change Picture"}
           </Button>
-          <Input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageChange} />
+          <Input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+          />
         </div>
 
-        <div className="space-y-1 text-center">
-          <h2 className="text-3xl font-bold text-foreground">Welcome, {name}!</h2>
-          <p className="text-muted-foreground">{email}</p>
-          <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-800 dark:text-white">
-            Role: {role || "User"}
-          </span>
+        <div className="space-y-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-foreground">Name</label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-foreground">Location</label>
+            <Input value={location} onChange={(e) => setLocation(e.target.value)} />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-muted-foreground">Email</label>
+            <Input value={user.email} disabled />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-muted-foreground">User Since</label>
+            <Input
+              value={new Date(user.createdAt).toLocaleDateString("en-IN", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+              disabled
+            />
+          </div>
+
+          <Button
+            onClick={handleProfileUpdate}
+            disabled={updating}
+            className="w-full bg-green-600 hover:bg-green-700"
+          >
+            {updating ? "Updating..." : "Update Profile"}
+          </Button>
         </div>
 
-        {role === "FARMER" ? (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Your Crop Dashboard</h3>
-            <ul className="list-disc list-inside text-sm text-muted-foreground">
-              <li>View all your listed crops</li>
-              <li>Track pricing and availability</li>
-              <li>Manage crop listings and sales</li>
-            </ul>
-            <Link href="/farmer/add-crop">
-              <Button className="mt-2 bg-green-600 hover:bg-green-700">Add New Crop</Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Your Buyer Dashboard</h3>
-            <ul className="list-disc list-inside text-sm text-muted-foreground">
-              <li>View past orders</li>
-              <li>Manage saved crops</li>
-              <li>Contact farmers</li>
-            </ul>
-            <Link href="/products">
-              <Button className="mt-2 bg-green-600 hover:bg-green-700">Browse Crops</Button>
-            </Link>
-          </div>
-        )}
-
-        <Button
-          onClick={logout}
-          variant="ghost"
-          className="text-sm font-medium flex items-center gap-1"
-          title="Logout"
-        >
-          <LogOut className="h-5 w-5" /> Logout
-        </Button>
+        <div className="text-center">
+          <Button
+            onClick={logout}
+            variant="ghost"
+            className="text-sm font-medium flex items-center gap-1"
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5" /> Logout
+          </Button>
+        </div>
       </div>
+
+      {/* Modal Shown Only on Update */}
+      {showSuccessModal && <SuccessModal onClose={() => setShowSuccessModal(false)} />}
     </section>
   );
 }
