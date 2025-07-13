@@ -104,7 +104,7 @@ export default function ProductsPage() {
 
   return (
     <div className="container py-8 px-4 md:px-6">
-      <div className="mb-7">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Fresh Local Products</h1>
         <p className="text-muted-foreground">
           Browse our selection of fresh, locally-grown produce and artisanal goods.
