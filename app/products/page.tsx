@@ -27,8 +27,8 @@ export default function ProductsPage() {
       );
       const data = await res.json();
 
-      setProducts((prev) => (reset ? data.products : [...prev, ...data.products]));
-      setHasMore(data.products.length === limit);
+      setProducts((prev) => (reset ? data?.products : [...prev, ...data.products]));
+      setHasMore(data?.products?.length === limit);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {
@@ -148,7 +148,7 @@ export default function ProductsPage() {
 
       <div className="mb-4">
         <p className="text-sm text-muted-foreground">
-          Showing {sortedProducts.length} of {products.length} products
+          Showing {sortedProducts?.length ?? 0} of {products?.length} products
         </p>
       </div>
 

@@ -34,6 +34,7 @@ export interface ProductFilterOptions {
     max: number;
   };
   sortBy?: "price-asc" | "price-desc" | "name-asc" | "name-desc";
+  search?: string;
 }
 
 export interface CartItem {
