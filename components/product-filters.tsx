@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -11,12 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Slider } from "@/components/ui/slider"
-import { Input } from "@/components/ui/input"
 import type { ProductCategory, ProductFilterOptions } from "@/types/product"
-import { ChevronDown, SlidersHorizontal, X, Search } from "lucide-react"
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-
-let debounceTimer: NodeJS.Timeout;
 
 interface ProductFiltersProps {
   filterOptions: ProductFilterOptions
@@ -25,14 +22,13 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: ProductFiltersProps) {
+  
   const filters = filterOptions ?? {}
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.priceRange?.min ?? 0,
     filters.priceRange?.max ?? maxPrice,
   ])
-
-  const [searchTerm, setSearchTerm] = useState(filters.search ?? "")
 
   const categories: { value: ProductCategory; label: string }[] = [
     { value: "vegetables", label: "Vegetables" },
@@ -87,7 +83,6 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
 
   const clearFilters = () => {
     setPriceRange([0, maxPrice])
-    setSearchTerm("")
     onFilterChange({})
   }
 
@@ -96,37 +91,13 @@ export function ProductFilters({ filterOptions, onFilterChange, maxPrice }: Prod
       (filters.categories && filters.categories.length > 0) ||
       filters.organic ||
       filters.inStock ||
-      filters.priceRange ||
-      filters.search
+      filters.priceRange
     )
-  }
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setSearchTerm(value)
-    if (debounceTimer) clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => {
-      onFilterChange({
-        ...filters,
-        search: value.trim() !== "" ? value.trim() : undefined,
-      })
-    }, 400)
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="pl-8 w-64"
-          />
-        </div>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">

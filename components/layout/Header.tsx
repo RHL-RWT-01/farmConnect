@@ -27,9 +27,9 @@ export default function Header() {
   //   }
   // }, [isAuthenticated, router]);
 
-  if (loading || !hasFetched) return <div className="flex items-center justify-center h-screen w-full">
-    <Loader className="h-20 w-20 animate-spin text-green-600" />
-  </div>
+  // if (loading || !hasFetched) return <div className="flex items-center justify-center h-screen w-full">
+  //   <Loader className="h-20 w-20 animate-spin text-green-600" />
+  // </div>
 
 
   return (
