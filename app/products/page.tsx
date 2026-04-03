@@ -5,6 +5,9 @@ import { ProductGrid } from "@/components/product-grid";
 import { ProductFilters } from "@/components/product-filters";
 import type { ProductFilterOptions, Product } from "@/types/product";
 import { useCartContext } from "@/contexts/CartContext";
+import { Search, Sprout, SlidersHorizontal } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ProductsPage() {
   const { addToCart } = useCartContext();
@@ -15,6 +18,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(true);
 
   const limit = 12;
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -36,7 +40,6 @@ export default function ProductsPage() {
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchProducts(true, search);
   }, []);
@@ -46,7 +49,7 @@ export default function ProductsPage() {
 
     debounceTimeout.current = setTimeout(() => {
       setPage(1);
-      fetchProducts(true, search); 
+      fetchProducts(true, search);
     }, 500);
 
     return () => {
@@ -54,7 +57,6 @@ export default function ProductsPage() {
     };
   }, [search]);
 
-  // Pagination observer
   const observer = useRef<IntersectionObserver | null>(null);
   const lastProductRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -104,69 +106,101 @@ export default function ProductsPage() {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (!filterOptions.sortBy) return 0;
     switch (filterOptions.sortBy) {
-      case "price-asc":
-        return a.price - b.price;
-      case "price-desc":
-        return b.price - a.price;
-      case "name-asc":
-        return a.name.localeCompare(b.name);
-      case "name-desc":
-        return b.name.localeCompare(a.name);
-      default:
-        return 0;
+      case "price-asc": return a.price - b.price;
+      case "price-desc": return b.price - a.price;
+      case "name-asc": return a.name.localeCompare(b.name);
+      case "name-desc": return b.name.localeCompare(a.name);
+      default: return 0;
     }
   });
 
   return (
-    <div className="container py-8 px-4 md:px-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Fresh Local Products</h1>
-        <p className="text-muted-foreground">
-          Browse our selection of fresh, locally-grown produce and artisanal goods.
+    <div className="container py-8 px-4 md:px-6 max-w-7xl">
+      {/* Header */}
+      <div className="mb-8 animate-fade-in-up">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+            <Sprout className="h-5 w-5 text-green-600" />
+          </div>
+          <h1 className="text-3xl font-bold gradient-text">Fresh Local Products</h1>
+        </div>
+        <p className="text-muted-foreground max-w-2xl">
+          Browse our selection of fresh, locally-grown produce and artisanal goods directly from verified farmers across India.
         </p>
       </div>
 
-      {/* Search bar */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-80 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        
+      {/* Search + Filter Toggle */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search products, farmers, categories..."
+            className="pl-10 rounded-xl bg-muted border-0 focus-visible:ring-2 focus-visible:ring-green-500/30 h-11"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            id="product-search"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="default"
+          className="gap-2 rounded-xl"
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          {showFilters ? "Hide" : "Show"} Filters
+        </Button>
       </div>
 
-      <div className="mb-6">
-        <ProductFilters
-          filterOptions={filterOptions}
-          onFilterChange={handleFilterChange}
-          maxPrice={maxPrice}
-        />
-      </div>
+      {/* Filters */}
+      {showFilters && (
+        <div className="mb-6 animate-fade-in-down">
+          <ProductFilters
+            filterOptions={filterOptions}
+            onFilterChange={handleFilterChange}
+            maxPrice={maxPrice}
+          />
+        </div>
+      )}
 
-      <div className="mb-4">
+      {/* Count */}
+      <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {sortedProducts?.length ?? 0} of {products?.length} products
+          Showing <span className="font-medium text-foreground">{sortedProducts?.length ?? 0}</span> of{" "}
+          <span className="font-medium text-foreground">{products?.length}</span> products
         </p>
       </div>
 
+      {/* Products */}
       {sortedProducts.length > 0 ? (
         <>
           <ProductGrid products={sortedProducts} onAddToCart={addToCart} />
           <div ref={lastProductRef} className="h-10" />
           {loading && (
-            <div className="text-center py-4 text-muted-foreground">Loading more...</div>
+            <div className="text-center py-6">
+              <div className="inline-flex items-center gap-2 text-muted-foreground">
+                <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+                Loading more products...
+              </div>
+            </div>
           )}
         </>
       ) : loading ? (
-        <div className="text-center py-12">Loading products...</div>
+        <div className="text-center py-16">
+          <div className="inline-flex items-center gap-2 text-muted-foreground">
+            <div className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+            Loading products...
+          </div>
+        </div>
       ) : (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium mb-2">No products found</h3>
-          <p className="text-muted-foreground">
-            Try adjusting your filters to find what you're looking for.
+        <div className="text-center py-16 animate-fade-in-up">
+          <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-2xl flex items-center justify-center">
+            <Search className="h-8 w-8 text-muted-foreground/40" />
+          </div>
+          <h3 className="text-lg font-semibold mb-1">No products found</h3>
+          <p className="text-muted-foreground text-sm">
+            Try adjusting your filters or search query.
           </p>
         </div>
       )}

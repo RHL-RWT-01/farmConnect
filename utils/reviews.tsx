@@ -1,125 +1,114 @@
 "use client"
-import Image from "next/image";
-import React from "react";
 
-interface Review {
-    name: string;
-    role: string;
-    text: string;
+import { Star, Quote } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+
+const reviews = [
+  {
+    name: "Rajesh Kumar",
+    role: "Wheat Farmer, Haryana",
+    rating: 5,
+    text: "FarmConnect transformed my business. I now sell directly to restaurants and stores without any middlemen taking their cut. My income has increased by 35%!",
+    initials: "RK",
+  },
+  {
+    name: "Priya Sharma",
+    role: "Restaurant Owner, Delhi",
+    rating: 5,
+    text: "The quality of produce we get through FarmConnect is outstanding. Fresh, organic vegetables delivered straight from farms. Our customers love the difference!",
+    initials: "PS",
+  },
+  {
+    name: "Mohammed Ali",
+    role: "Organic Spice Farmer, Kerala",
+    rating: 4,
+    text: "The analytics dashboard helps me understand which products are in demand. I can plan my crops better and ensure nothing goes to waste. Excellent platform!",
+    initials: "MA",
+  },
+  {
+    name: "Sunita Patel",
+    role: "Grocery Chain Buyer, Mumbai",
+    rating: 5,
+    text: "We switched to FarmConnect for 60% of our sourcing. The verified farmer network and transparent pricing make bulk purchasing seamless and cost-effective.",
+    initials: "SP",
+  },
+  {
+    name: "Arjun Reddy",
+    role: "Mango Orchardist, AP",
+    rating: 5,
+    text: "Seasonal produce used to be risky — now I list early and get pre-orders. FarmConnect's secure payment system ensures I always get paid on time.",
+    initials: "AR",
+  },
+  {
+    name: "Lakshmi Devi",
+    role: "Dairy Farmer, Gujarat",
+    rating: 4,
+    text: "From listing my ghee products to handling deliveries, FarmConnect makes everything simple. The AI assistant even helps me write better product descriptions!",
+    initials: "LD",
+  },
+]
+
+export default function Reviews() {
+  return (
+    <section id="testimonials" className="w-full py-20 md:py-28 bg-muted/30">
+      <div className="container px-4 md:px-6">
+        <div className="text-center mb-16 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-100 dark:bg-green-900/30 rounded-full text-sm font-medium text-green-700 dark:text-green-400 mb-4">
+            <Star className="h-4 w-4 fill-current" />
+            Trusted by Thousands
+          </div>
+          <h2 className="text-3xl font-bold sm:text-4xl">
+            What Our <span className="gradient-text">Users Say</span>
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-2xl mx-auto text-lg">
+            Real stories from farmers and buyers who transformed their business with FarmConnect
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+          {reviews.map((review, index) => (
+            <Card
+              key={index}
+              className="border-border/50 premium-card overflow-hidden"
+            >
+              <CardContent className="p-6 space-y-4">
+                {/* Quote icon */}
+                <Quote className="h-8 w-8 text-green-500/20" />
+
+                {/* Stars */}
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      className={`h-4 w-4 ${
+                        s <= review.rating
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-muted-foreground/20"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Review text */}
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  &ldquo;{review.text}&rdquo;
+                </p>
+
+                {/* Author */}
+                <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-sm font-bold">
+                    {review.initials}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{review.name}</p>
+                    <p className="text-xs text-muted-foreground">{review.role}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }
-
-const reviews: Review[] = [
-    {
-        name: "Ramesh",
-        role: "Organic Vegetable Farmer",
-        text: "Since joining AgriConnect, I've increased my profit margins by 30% and built relationships with restaurants and grocery stores I never had access to before.",
-    },
-    {
-        name: "Ramdayal",
-        role: "Restaurant Owner",
-        text: "AgriConnect has revolutionized our supply chain. We now source directly from local farmers, ensuring fresher ingredients and supporting our community.",
-    },
-    {
-        name: "Sita",
-        role: "Dairy Farmer",
-        text: "Now I can sell milk directly to urban vendors without middlemen. AgriConnect is a game-changer.",
-    },
-    {
-        name: "Arjun",
-        role: "Fruit Supplier",
-        text: "Managing logistics is easier than ever. I can focus more on quality now!",
-    },
-    {
-        name: "Geeta",
-        role: "Agro Tech Consultant",
-        text: "The platform offers real-time data that helps our clients grow more efficiently.",
-    },
-    {
-        name: "Mukesh",
-        role: "Grocery Chain Owner",
-        text: "Sourcing local and fresh has helped our sales go up. Customers love it!",
-    },
-    {
-        name: "Radha",
-        role: "Spice Exporter",
-        text: "Exporting organic turmeric is smoother thanks to the FarmConnect network.",
-    },
-    {
-        name: "Shyam",
-        role: "Greenhouse Farmer",
-        text: "We cut costs by 20% using the app’s direct buyer feature!",
-    },
-];
-
-const Reviews: React.FC = () => {
-    return (
-        <section
-            id="testimonials"
-            className="w-full py-12 md:py-24 lg:py-32 bg-muted dark:bg-muted/50 overflow-hidden"
-        >
-            <div className="container px-4 md:px-6">
-                <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                    <div className="space-y-2">
-                        <div className="inline-block rounded-lg bg-green-100 dark:bg-green-900/30 px-3 py-1 text-sm text-green-800 dark:text-green-300">
-                            Success Stories
-                        </div>
-                        <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
-                            What Our Users Say
-                        </h2>
-                        <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                            Hear from farmers and businesses who have transformed their operations with FarmConnect.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="relative mt-12 overflow-hidden">
-                    <div className="flex animate-scroll gap-6 w-max">
-                        {reviews.map((user, idx) => (
-                            <div
-                                key={idx}
-                                className="rounded-lg border bg-background p-6 w-[300px] flex-shrink-0 shadow-green-glow"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <Image
-                                        src="/profile.png"
-                                        width={60}
-                                        height={60}
-                                        alt={`${user.name} portrait`}
-                                        className="rounded-full"
-                                    />
-                                    <div>
-                                        <h3 className="text-lg font-bold">{user.name}</h3>
-                                        <p className="text-sm text-muted-foreground">{user.role}</p>
-                                    </div>
-                                </div>
-                                <p className="mt-4 text-muted-foreground">"{user.text}"</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Animation + Shadow CSS */}
-            <style jsx>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .animate-scroll {
-          animation: scroll 20s linear infinite;
-        }
-
-        .shadow-green-glow {
-          box-shadow: 0 0 10px 2px rgba(66, 245, 93, 0.3);
-        }
-      `}</style>
-        </section>
-    );
-};
-
-export default Reviews;

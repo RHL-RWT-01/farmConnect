@@ -1,71 +1,88 @@
-import Image from "next/image";
-import React from "react";
+"use client"
 
-import { Users,BarChart3,ShieldCheck } from "lucide-react";
+import {
+  Shield,
+  Leaf,
+  TrendingDown,
+  DollarSign,
+  Truck,
+  BarChart3,
+  Award,
+} from "lucide-react"
 
-const Benefits: React.FC = () => {
+const benefits = [
+  {
+    icon: <TrendingDown className="h-6 w-6" />,
+    title: "Eliminate Middlemen",
+    description:
+      "Farmers sell directly to buyers, increasing their earnings by up to 40% while reducing prices for consumers.",
+  },
+  {
+    icon: <Shield className="h-6 w-6" />,
+    title: "Verified Sellers",
+    description:
+      "Every farmer and business is verified, ensuring trust, authenticity, and quality in every transaction.",
+  },
+  {
+    icon: <Leaf className="h-6 w-6" />,
+    title: "Organic & Fresh",
+    description:
+      "Browse a wide selection of organic and freshly harvested produce from farms across India.",
+  },
+  {
+    icon: <DollarSign className="h-6 w-6" />,
+    title: "Fair Pricing",
+    description:
+      "Transparent pricing with no hidden fees. See exactly what you pay and what farmers earn.",
+  },
+  {
+    icon: <Truck className="h-6 w-6" />,
+    title: "Pan-India Delivery",
+    description:
+      "Reliable logistics network ensures your produce reaches you fresh, anywhere in India.",
+  },
+  {
+    icon: <BarChart3 className="h-6 w-6" />,
+    title: "Smart Analytics",
+    description:
+      "Farmers get real-time insights into sales, trends, and customer preferences to grow their business.",
+  },
+]
 
-    return (
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32">
-            <div className="container px-4 md:px-6">
-                <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                    <div className="space-y-2">
-                        <div className="inline-block rounded-lg bg-green-100 dark:bg-green-900/30 px-3 py-1 text-sm text-green-800 dark:text-green-300">
-                            Platform Benefits
-                        </div>
-                        <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Why Choose AgriConnect</h2>
-                        <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                            Our platform offers unique advantages for both farmers and businesses.
-                        </p>
-                    </div>
-                </div>
-                <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-                    <div className="grid gap-6">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                                <BarChart3 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold">Better Profit Margins</h3>
-                                <p className="text-muted-foreground">
-                                    Farmers earn more by selling directly to businesses without intermediaries.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                                <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold">Quality Assurance</h3>
-                                <p className="text-muted-foreground">
-                                    Verified profiles and reviews ensure quality products and reliable transactions.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                                <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold">Community Support</h3>
-                                <p className="text-muted-foreground">
-                                    Join a network of farmers and businesses sharing knowledge and best practices.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <Image
-                        src="/placeholder2.png?height=400&width=400"
-                        width={400}
-                        height={400}
-                        alt="Platform features"
-                        className="mx-auto aspect-square overflow-hidden rounded-xl object-cover"
-                    />
-                </div>
+export default function Benefits() {
+  return (
+    <section id="features" className="w-full py-20 md:py-28 bg-background">
+      <div className="container px-4 md:px-6">
+        <div className="text-center mb-16 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-100 dark:bg-green-900/30 rounded-full text-sm font-medium text-green-700 dark:text-green-400 mb-4">
+            <Award className="h-4 w-4" />
+            Why Choose Us
+          </div>
+          <h2 className="text-3xl font-bold sm:text-4xl">
+            Benefits of <span className="gradient-text">FarmConnect</span>
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-2xl mx-auto text-lg">
+            Building a transparent, efficient, and sustainable agricultural ecosystem
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+          {benefits.map((benefit, index) => (
+            <div
+              key={index}
+              className="group p-6 rounded-2xl bg-card border hover:border-green-500/30 premium-card"
+            >
+              <div className="w-14 h-14 mb-5 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                {benefit.icon}
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {benefit.description}
+              </p>
             </div>
-        </section>
-    )
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }
-
-export default Benefits;

@@ -1,4 +1,3 @@
-
 export type UserRole = "FARMER" | "BUYER"
 
 export interface User {
@@ -7,6 +6,9 @@ export interface User {
   email: string
   role: UserRole
   image?: string
-  location?: string 
+  location?: string
+  phone?: string
+  bio?: string
+  verified?: boolean
   createdAt: string
 }
